@@ -1,0 +1,26 @@
+CREATE TABLE  IF NOT EXISTS puzzles (
+	id INTEGER PRIMARY KEY, 
+	created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+	group_size INTEGER NOT NULL DEFAULT 4 CHECK(group_size IN (3, 4)), 
+	is_published INTEGER NOT NULL DEFAULT 0 CHECK(is_published IN (0, 1)), 
+	number INTEGER NOT NULL UNIQUE
+); 
+
+CREATE TABLE IF NOT EXISTS categories (
+	id INTEGER PRIMARY KEY, 
+	puzzle_id INTEGER NOT NULL 
+		REFERENCES puzzles(id) ON DELETE CASCADE, 
+	title TEXT NOT NULL, 
+	difficulty INTEGER NOT NULL 
+		CHECK(difficulty BETWEEN 1 AND 4), 
+	UNIQUE(puzzle_id, difficulty)
+); 
+
+CREATE TABLE IF NOT EXISTS tiles(
+	id INTEGER PRIMARY KEY, 
+	category_id INTEGER NOT NULL 
+		REFERENCES categories(id) ON DELETE CASCADE, 
+	text TEXT NOT NULL, 
+	position INTEGER NOT NULL
+		CHECK(position BETWEEN 0 AND 15)
+);
