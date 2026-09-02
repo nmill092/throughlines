@@ -13,7 +13,8 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types ./src/worker-configuration.d.ts"
+    "cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
+    "db:seed:local": "npx wrangler d1 execute DB --local --file=src/lib/db/seed.sql"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -30,6 +31,7 @@
     "prettier-plugin-svelte": "^4.1.0",
     "svelte": "^5.56.1",
     "svelte-check": "^4.6.0",
+    "tsx": "^4.23.13",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.60.1",
     "vite": "^8.0.16",
