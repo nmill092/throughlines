@@ -14,7 +14,7 @@
     "format": "prettier --write .",
     "deploy": "npm run build && wrangler deploy",
     "cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
-    "db:seed:local": "npx wrangler d1 execute DB --local --file=src/lib/db/seed.sql"
+    "db:seed:local": "npx wrangler d1 execute DB --local --file=src/lib/server/db/seed.sql"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

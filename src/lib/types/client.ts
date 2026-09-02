@@ -1,6 +1,7 @@
 export type ClientTile = {
   id: number;
   text: string; 
+  position: number; 
 }
 
 export type ClientPuzzle = {

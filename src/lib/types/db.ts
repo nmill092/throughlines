@@ -1,6 +1,6 @@
 export type PuzzleRaw = {
   id: number;
-  created_at: number; 
+  created_at: string; 
   group_size: 3 | 4; 
   is_published: 0 | 1; 
   number: number; 

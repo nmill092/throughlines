@@ -17,4 +17,5 @@ export type Category = {
 export type Tile = {
   id: number; 
   text: string; 
+  position: number; 
 }
