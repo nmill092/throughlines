@@ -6,8 +6,10 @@
 	import Board from './Board.svelte';
 	import Controls from './Controls.svelte';
 	import Mistakes from './Mistakes.svelte';
-  
+
 	import { toShuffled } from '$lib/utils';
+	import Toast from './Toast.svelte';
+	import { correctMessages, incorrectMessages, oneAwayMessage, pickMessage, type ToastMessage } from '$lib/toast';
 	interface Props {
 		puzzle: ClientPuzzle;
 	}
@@ -20,6 +22,7 @@
 	let boardReady = $state(false);
   let solvedGroups = $state<SolvedGroup[]>([]);
   let mistakes = $state(0); 
+  let toastMessage = $state<ToastMessage | null>(null);
 
 	let board: Board;
 
@@ -28,6 +31,12 @@
 	let canDeselect = $derived(selectedTileIds.length > 0);
 
 	let tiles = $state(puzzle.tiles.sort((a, b) => (a.position > b.position ? 1 : -1)));
+
+  $effect(() => {
+    if (!toastMessage) return; 
+    const t = setTimeout(() => (toastMessage = null), 2000)
+    return () => clearTimeout(t); 
+  })
 
 	const handleToggleTile = (id: number) => {
 		if (!canInteract) return;
@@ -53,6 +62,9 @@
 		if (!canInteract) return;
 		selectedTileIds = [];
 	};
+
+  const updateToastMessage = (message: ToastMessage) => 
+    toastMessage = message; 
 
 	const handleSubmitGuess = async () => {
 		if (!canSubmit || !canInteract) return;
@@ -108,8 +120,13 @@
 
   const evaluateResult = async (response: GuessResponse) => {
     if (response.result === 'correct') {
+      toastMessage = pickMessage(correctMessages); 
       await handleCorrectGuess(response.group);
     } else if (response.result === 'incorrect') {
+      toastMessage = pickMessage(incorrectMessages); 
+      await handleIncorrectGuess(); 
+    } else if (response.result === 'one-away') {
+      toastMessage = oneAwayMessage; 
       await handleIncorrectGuess(); 
     }
   }
@@ -130,8 +147,9 @@
 		onReady={handleBoardReady}
 		onToggleTile={handleToggleTile}
 	/>
-  <Mistakes {mistakes}/>
 	{#if boardReady}
+    <Toast message={toastMessage}/>
+    <Mistakes {mistakes}/>
 		<Controls
 			{canDeselect}
 			{canSubmit}
@@ -144,9 +162,10 @@
 
 <style>
 	.game__inner {
-		padding-block-start: var(--space-xl);
+		padding-block-start: var(--space-md);
 		display: grid;
 		gap: var(--space-s);
+    position: relative; 
 	}
 
 	.game__lede {

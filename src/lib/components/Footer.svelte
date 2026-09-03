@@ -3,7 +3,7 @@
 </script>
 
 <footer class="footer">
-  <div class="container--wide">
+  <div class="container">
     <div class="footer__inner">
       <div class="motion">
         Disable Animations? { motion.reduced ? 'Disable' : 'Enable' }
@@ -17,6 +17,7 @@
 <style>
   .footer {
     height: 4rem; 
+    margin-block-start: var(--space-md);
     background-color: var(--color-accent);
     display: flex;
     align-items: center;

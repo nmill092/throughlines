@@ -15,8 +15,8 @@
 
 <div role="group" in:fade aria-label="Board controls" class="controls">
 	<button class="pill control" onclick={onShuffle}>Shuffle</button>
-	<button class="pill control" disabled={!canSubmit} onclick={onSubmit}>Guess</button>
-	<button class="pill control" disabled={!canDeselect} onclick={onDeselect}>Deselect All</button>
+	<button class="pill control guess" disabled={!canSubmit} onclick={onSubmit}>Guess</button>
+	<button class="pill control" disabled={!canDeselect} onclick={onDeselect}>Deselect</button>
 </div>
 
 <style>
@@ -28,7 +28,7 @@
 	}
 
 	.control {
-		--px: var(--space-md);
+		--px: var(--space-xs);
 		text-transform: uppercase;
 		transition:
 			scale 0.4s
@@ -79,4 +79,9 @@
 			cursor: not-allowed;
 		}
 	}
+
+  .guess {
+    background-color: var(--color-accent);
+    border: 1px solid var(--color-accent); 
+  }
 </style>

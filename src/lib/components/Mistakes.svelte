@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { fade } from "svelte/transition";
+
   interface Props {
     mistakes: number; 
   }  
@@ -6,7 +8,7 @@
   let { mistakes }: Props = $props(); 
 </script>
 
-<div class="mistakes">
+<div class="mistakes" in:fade>
   {#each Array.from({ length: 4 }) as _, i}
     <div class="mistake" class:filled={i < mistakes}>
 

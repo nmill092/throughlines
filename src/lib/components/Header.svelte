@@ -19,8 +19,10 @@
 
 <style>
   .header {
-		margin-block-start: var(--space-lg);
-		
+		padding-block: var(--space-xs);
+    display: flex;
+    align-items: center;
+    background: oklch(from var(--color-paper) calc(l - .02) c h);    
 	}
   .header__inner {
     display: flex;
@@ -36,11 +38,10 @@
 	}
 
   .header__archive-btn {
-    --border: transparent; 
+    --border: var(--offblack); 
     --px: var(--space-md);
 
     align-self: center; 
-    background-color: var(--color-yellow);
     text-transform: uppercase; 
     font-weight: 800;
     text-wrap: nowrap; 

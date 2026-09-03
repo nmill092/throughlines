@@ -175,6 +175,6 @@
     display: grid;
 		gap: var(--space-3xs);
 		grid-template-columns: repeat(var(--group-size, 4), 1fr);
-		grid-auto-rows: var(--tile-height);
+    grid-auto-rows: clamp(3.5rem, 13svh, 7.5rem);
   }
 </style>
