@@ -1,0 +1,8 @@
+body { 
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background-color: var(--color-paper);
+  font-family: var(--font-body);
+  color: var(--color-body);
+}

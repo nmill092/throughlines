@@ -1,0 +1,59 @@
+:root {
+
+/** primitives **/ 
+--color-beige: oklch(98.25% 0.01 84.57); 
+
+--color-yellow: oklch(85.61% 0.11 81.09); 
+--color-red: oklch(70.42% 0.19 17.75);  
+--color-green: oklch(84.01% 0.1 122.35); 
+--color-blue: oklch(87.28% 0.05 258.83); 
+--color-offblack: oklch(31.32% 0 0); 
+--color-jameswhite: oklch(94.43% 0.02 114.38); 
+
+--font-public-sans: 'Public Sans Variable', system-ui, sans-serif;
+--font-suez-one: 'Suez One', serif;
+
+
+/** font sizes **/
+/* https://utopia.fyi/type/calculator?c=360,16,1.2,1440,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */ 
+  --fs-xs: clamp(0.6944rem, 0.6593rem + 0.1564vw, 0.8rem);
+  --fs-s: clamp(0.8333rem, 0.7778rem + 0.2469vw, 1rem);
+  --fs-md: clamp(1rem, 0.9167rem + 0.3704vw, 1.25rem);
+  --fs-lg: clamp(1.2rem, 1.0792rem + 0.537vw, 1.5625rem);
+  --fs-xl: clamp(1.44rem, 1.269rem + 0.7602vw, 1.9531rem);
+  --fs-2xl: clamp(1.728rem, 1.4902rem + 1.0569vw, 2.4414rem);
+  --fs-3xl: clamp(2.0736rem, 1.7475rem + 1.4491vw, 3.0518rem);
+  --fs-4xl: clamp(2.4883rem, 2.0462rem + 1.965vw, 3.8147rem);
+  --fs-hero: clamp(2.986rem, 2.3919rem + 2.6406vw, 4.7684rem);
+
+
+/** spacing **/
+/* see https://utopia.fyi/space/calculator?c=360,16,1.2,1440,20,1.25,5,2,&s=0.75|0.5|0.25,1.5|2|3|4|6,s-l&g=s,l,xl,12 */
+  --space-3xs: clamp(0.25rem, 0.2292rem + 0.0926vw, 0.3125rem);
+  --space-2xs: clamp(0.5rem, 0.4583rem + 0.1852vw, 0.625rem);
+  --space-xs: clamp(0.75rem, 0.6875rem + 0.2778vw, 0.9375rem);
+  --space-s: clamp(1rem, 0.9167rem + 0.3704vw, 1.25rem);
+  --space-md: clamp(1.5rem, 1.375rem + 0.5556vw, 1.875rem);
+  --space-lg: clamp(2rem, 1.8333rem + 0.7407vw, 2.5rem);
+  --space-xl: clamp(3rem, 2.75rem + 1.1111vw, 3.75rem);
+  --space-2xl: clamp(4rem, 3.6667rem + 1.4815vw, 5rem);
+  --space-3xl: clamp(6rem, 5.5rem + 2.2222vw, 7.5rem);
+  --space-4xl: clamp(6rem, 5.5rem + 2.2222vw, 7.5rem);
+  --space-5xl: clamp(6rem, 5.5rem + 2.2222vw, 7.5rem);
+
+/** semantics **/ 
+--color-paper: var(--color-beige); 
+--color-body: var(--color-offblack);
+--color-difficulty-1: var(--color-green);
+--color-difficulty-2: var(--color-blue);
+--color-difficulty-3: var(--color-yellow);
+--color-difficulty-4: var(--color-red); 
+--color-accent: var(--color-yellow);
+--color-tile: var(--color-jameswhite);
+
+--font-body: var(--font-public-sans);
+--font-brand: var(--font-suez-one);
+
+--page-gutter: var(--space-xl);
+--radius-pill: 999px; 
+}
