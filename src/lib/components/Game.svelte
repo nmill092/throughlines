@@ -1,12 +1,13 @@
 <script lang="ts">
-	import { type ClientPuzzle } from '$lib/types/client';
-	import { fade, fly } from 'svelte/transition';
-	import Board from './Board.svelte';
-	import type { AnimationPhase, GameStatus } from '$lib/types/game';
-	import Controls from './Controls.svelte';
-	import { toShuffled } from '$lib/utils';
+  import { type ClientPuzzle } from '$lib/types/client';
 	import type { GuessResponse, SolvedGroup } from '$lib/types/puzzle';
+	import type { AnimationPhase, GameStatus } from '$lib/types/game';
 
+	import Board from './Board.svelte';
+	import Controls from './Controls.svelte';
+	import Mistakes from './Mistakes.svelte';
+  
+	import { toShuffled } from '$lib/utils';
 	interface Props {
 		puzzle: ClientPuzzle;
 	}
@@ -18,6 +19,7 @@
 	let selectedTileIds = $state<number[]>([]);
 	let boardReady = $state(false);
   let solvedGroups = $state<SolvedGroup[]>([]);
+  let mistakes = $state(0); 
 
 	let board: Board;
 
@@ -89,16 +91,16 @@
       });  
 
     animationPhase = 'fusing';
-
     tiles = [...tiles.filter((t) => !selectedTileIds.includes(t.id))]; 
+
     solvedGroups.push(responseGroup);
     selectedTileIds = []; 
-
     animationPhase = null; 
   }
 
   const handleIncorrectGuess = async () => {
     animationPhase = 'shaking'; 
+    mistakes++; 
     await board.shakeTiles(); 
     selectedTileIds = []; 
     animationPhase = null; 
@@ -128,7 +130,7 @@
 		onReady={handleBoardReady}
 		onToggleTile={handleToggleTile}
 	/>
-
+  <Mistakes {mistakes}/>
 	{#if boardReady}
 		<Controls
 			{canDeselect}
