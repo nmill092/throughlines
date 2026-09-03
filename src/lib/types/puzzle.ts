@@ -1,3 +1,5 @@
+import type { ClientTile } from "./client";
+
 export type Puzzle = {
   id: number; 
   number: number; 
@@ -19,3 +21,18 @@ export type Tile = {
   text: string; 
   position: number; 
 }
+
+export type GuessResponse = | {
+  result: 'correct',
+  group: {
+    title: string; 
+    difficulty: 1 | 2 | 3 | 4; 
+    tiles: ClientTile[]; 
+  }
+} | { result: 'one-away' } | { result: 'incorrect'};
+
+export type SolvedGroup = {
+  title: string;
+  difficulty: 1 | 2 | 3 | 4;
+  tiles: ClientTile[];
+};
