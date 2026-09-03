@@ -38,6 +38,10 @@ export const getPuzzleByNumber = async (number: number, db: D1Database): Promise
       tiles: tileRows
         .results
         .filter(cId => cId.category_id === row.id)
+        .map(tile => {
+          const {category_id, ...rest} = tile;
+          return rest    
+        })
     }));
 
     return { 

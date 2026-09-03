@@ -1,11 +1,13 @@
 <script lang="ts">
-  let { data } = $props();
-  
-  let tiles = $state(data.puzzle.tiles);
+	import Game from '$lib/components/Game.svelte';
+	let { data } = $props();
 </script>
 
-<ul>
-  {#each tiles as tile (tile.id)}
-    <li>{tile.text}</li>
-  {/each}
-</ul>
+<section class="game">
+	<div class="container">
+		<Game puzzle={data.puzzle} />
+	</div>
+</section>
+
+<style>
+</style>

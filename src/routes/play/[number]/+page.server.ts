@@ -24,8 +24,8 @@ export const load: PageServerLoad = async ({ params, platform }) => {
 
   const sortedTiles = puzzle.categories
     .flatMap(c => c.tiles)
-    .sort((a, b) => a.position > b.position ? 1 : -1)
-
+    .sort((a, b) => a.position > b.position ? 1 : -1);
+    
 
   return { 
     puzzle: {
