@@ -13,6 +13,7 @@
   let tileMap = $state(new SvelteMap());
 
   interface Props {
+    canSelect: boolean; 
     canInteract: boolean; 
     selectedTileIds: number[];
     tiles: ClientTile[];
@@ -24,6 +25,7 @@
 
   let { 
     canInteract,
+    canSelect, 
     selectedTileIds, 
     tiles, 
     groupSize, 
@@ -90,8 +92,8 @@
     })
   }
 
-  export const celebrateTiles = async (difficulty: number) => {
-    const tiles = getTilesById(selectedTileIds); 
+  export const celebrateTiles = async (ids: number[], difficulty: number) => {
+    const tiles = getTilesById(ids); 
     return new Promise((res) => {
 			gsap.killTweensOf(tiles);
 			const tl = gsap.timeline({ 
@@ -122,6 +124,8 @@
       }, 0)
 		});
   }
+
+
 
   export const shakeTiles = async() => {
     const tiles = getTilesById(selectedTileIds); 
@@ -157,6 +161,7 @@
   {/each}
   {#each tiles as tile (tile.id)}
     <Tile
+      {canSelect}
       {canInteract}
       id={tile.id} 
       position={tile.position}

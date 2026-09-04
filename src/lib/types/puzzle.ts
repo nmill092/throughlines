@@ -29,7 +29,8 @@ export type GuessResponse = | {
     difficulty: 1 | 2 | 3 | 4; 
     tiles: ClientTile[]; 
   }
-} | { result: 'one-away' } | { result: 'incorrect'};
+} | { result: 'one-away'; solution?: SolvedGroup[] } 
+  | { result: 'incorrect'; solution?: SolvedGroup[] };
 
 export type SolvedGroup = {
   title: string;

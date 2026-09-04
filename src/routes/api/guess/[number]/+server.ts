@@ -7,7 +7,8 @@ import { z } from 'zod';
 const guessBodySchema = z.object({ 
   tileIds: z.array(z.number().int().nonnegative()).nonempty().refine(items => {
     return new Set(items).size === items.length; 
-  })
+  }),
+  mistakes: z.number().int().min(0).max(3)
 }); 
 
 export const POST: RequestHandler = async({ params, request, platform }) => {
@@ -38,7 +39,7 @@ export const POST: RequestHandler = async({ params, request, platform }) => {
   }
 
   const puzzle = await getPuzzleByNumber(number, platform.env.DB); 
-
+  
   if (!puzzle || !puzzle.isPublished) {
     error(404, 'Puzzle not found'); 
   }
@@ -53,6 +54,14 @@ export const POST: RequestHandler = async({ params, request, platform }) => {
   }
 
   const result = await evaluateGuess(puzzle, tileIds); 
+
+  if (parsedBody.data.mistakes === 3 && (result.result === 'incorrect' || result.result === 'one-away')) {
+    result.solution = puzzle.categories.map(category => ({
+      difficulty: category.difficulty, 
+      title: category.title, 
+      tiles: category.tiles
+    }))
+  }
 
   return json(result); 
 }; 

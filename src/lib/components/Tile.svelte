@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { fade, scale } from "svelte/transition";
+	import { scale } from "svelte/transition";
 
   interface Props { 
     id: number, 
     canInteract: boolean, 
+    canSelect: boolean, 
     position: number,
     text: string,
     selected: boolean,
@@ -15,6 +16,7 @@
   let { 
     id, 
     canInteract, 
+    canSelect, 
     position,
     text, 
     selected, 
@@ -24,6 +26,8 @@
   }: Props = $props(); 
 
   let mounted = $state(false); 
+
+  let disabled = $derived(!canInteract || (!canSelect && !selected)); 
 
   $effect(() => {
     mounted = true; 
@@ -35,7 +39,7 @@
   <button
       in:scale={{ delay: position * 20 }}
       class="tile" 
-      disabled={!canInteract}
+      disabled={disabled}
       class:selected={selected} 
       use:registerTileEl={id}
       onclick={onToggleSelect}

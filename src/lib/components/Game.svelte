@@ -1,15 +1,20 @@
 <script lang="ts">
-  import { type ClientPuzzle } from '$lib/types/client';
-	import type { GuessResponse, SolvedGroup } from '$lib/types/puzzle';
+	import { type ClientPuzzle } from '$lib/types/client';
 	import type { AnimationPhase, GameStatus } from '$lib/types/game';
+	import type { GuessResponse, SolvedGroup } from '$lib/types/puzzle';
 
 	import Board from './Board.svelte';
 	import Controls from './Controls.svelte';
 	import Mistakes from './Mistakes.svelte';
 
+	import {
+		pickMessage,
+		toastMessages,
+		type ToastKey,
+		type ToastMessage
+	} from '$lib/toast';
 	import { toShuffled } from '$lib/utils';
 	import Toast from './Toast.svelte';
-	import { correctMessages, incorrectMessages, oneAwayMessage, pickMessage, type ToastMessage } from '$lib/toast';
 	interface Props {
 		puzzle: ClientPuzzle;
 	}
@@ -20,24 +25,25 @@
 	let gameStatus: GameStatus = $state('playing');
 	let selectedTileIds = $state<number[]>([]);
 	let boardReady = $state(false);
-  let solvedGroups = $state<SolvedGroup[]>([]);
-  let mistakes = $state(0); 
-  let toastMessage = $state<ToastMessage | null>(null);
-  let guessKeys = $state<string[]>([]); 
+	let solvedGroups = $state<SolvedGroup[]>([]);
+	let mistakes = $state(0);
+	let toastMessage = $state<ToastMessage | null>(null);
+	let guessKeys = $state<string[]>([]);
 
 	let board: Board;
 
 	let canInteract = $derived(animationPhase === null && gameStatus === 'playing');
 	let canSubmit = $derived(canInteract && selectedTileIds.length === puzzle.groupSize);
+  let canSelect = $derived(canInteract && selectedTileIds.length < puzzle.groupSize); 
 	let canDeselect = $derived(selectedTileIds.length > 0);
 
 	let tiles = $state(puzzle.tiles.sort((a, b) => (a.position > b.position ? 1 : -1)));
 
-  $effect(() => {
-    if (!toastMessage) return; 
-    const t = setTimeout(() => (toastMessage = null), 2000)
-    return () => clearTimeout(t); 
-  })
+	$effect(() => {
+		if (!toastMessage) return;
+		const t = setTimeout(() => (toastMessage = null), 2000);
+		return () => clearTimeout(t);
+	});
 
 	const handleToggleTile = (id: number) => {
 		if (!canInteract) return;
@@ -54,6 +60,7 @@
 	};
 
 	const handleShuffleTiles = async () => {
+		if (!canInteract) return;
 		animationPhase = 'shuffling';
 		await board.shuffleTiles(() => (tiles = toShuffled(tiles)));
 		animationPhase = null;
@@ -67,15 +74,14 @@
 	const handleSubmitGuess = async () => {
 		if (!canSubmit || !canInteract) return;
 
-    const guessKey = selectedTileIds.sort().join(',');
+		const guessKey = [...selectedTileIds].sort().join(',');
 
-    if (guessKeys.includes(guessKey)) {
-      toastMessage = { id: 'guessed', text: 'You already guessed that!' };
-      return; 
-    }
+		if (guessKeys.includes(guessKey)) {
+			showToast('duplicate');
+			return;
+		}
 
-    guessKeys.push(guessKey); 
-
+		guessKeys.push(guessKey);
 
 		gameStatus = 'submitting';
 
@@ -83,7 +89,7 @@
 			const res = await fetch(`/api/guess/${puzzle.number}`, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ tileIds: selectedTileIds })
+				body: JSON.stringify({ tileIds: selectedTileIds, mistakes })
 			});
 
 			if (!res.ok) {
@@ -91,54 +97,97 @@
 			}
 
 			const response: GuessResponse = await res.json();
-      await evaluateResult(response);
+			await evaluateResult(response);
 		} catch (err) {
 			console.error({ err });
 		} finally {
-			gameStatus = 'playing';
+			if (gameStatus === 'submitting') {
+				gameStatus = 'playing';
+			} else if (gameStatus === 'revealing-loss') {
+				gameStatus = 'lost';
+			}
 		}
 	};
 
-  const handleCorrectGuess = async (responseGroup: SolvedGroup) => {
-    animationPhase = 'celebrating';
-    await board.celebrateTiles(responseGroup.difficulty);
+	const absorbTiles = async (group: SolvedGroup, groupIds: number[]) => {
+		animationPhase = 'gathering';
 
-    animationPhase = 'gathering';
-    await board.gatherTiles(() => {
-        tiles = [
-          ...tiles.filter((t) => selectedTileIds.includes(t.id)),
-          ...tiles.filter((t) => !selectedTileIds.includes(t.id))
-        ];
-      });  
+		await board.gatherTiles(() => {
+			tiles = [
+				...tiles.filter((t) => groupIds.includes(t.id)),
+				...tiles.filter((t) => !groupIds.includes(t.id))
+			];
+		});
 
-    animationPhase = 'fusing';
-    tiles = [...tiles.filter((t) => !selectedTileIds.includes(t.id))]; 
+		animationPhase = 'fusing';
+		tiles = [...tiles.filter((t) => !groupIds.includes(t.id))];
 
-    solvedGroups.push(responseGroup);
-    selectedTileIds = []; 
-    animationPhase = null; 
-  }
+		solvedGroups.push(group);
+	};
 
-  const handleIncorrectGuess = async () => {
-    animationPhase = 'shaking'; 
-    mistakes++; 
-    await board.shakeTiles(); 
-    selectedTileIds = []; 
-    animationPhase = null; 
-  }
+	const handleCorrectGuess = async (responseGroup: SolvedGroup) => {
+		const groupTileIds = responseGroup.tiles.map((t) => t.id);
+		animationPhase = 'celebrating';
+		await board.celebrateTiles(groupTileIds, responseGroup.difficulty);
+		await absorbTiles(responseGroup, groupTileIds);
+		selectedTileIds = [];
+		animationPhase = null;
+	};
 
-  const evaluateResult = async (response: GuessResponse) => {
-    if (response.result === 'correct') {
-      toastMessage = pickMessage(correctMessages); 
-      await handleCorrectGuess(response.group);
-    } else if (response.result === 'incorrect') {
-      toastMessage = pickMessage(incorrectMessages); 
-      await handleIncorrectGuess(); 
-    } else if (response.result === 'one-away') {
-      toastMessage = { id: 'one-away', text: 'One away!' }; 
-      await handleIncorrectGuess(); 
+	const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+	const handleIncorrectGuess = async (solution?: SolvedGroup[]) => {
+		animationPhase = 'shaking';
+		mistakes++;
+
+		await board.shakeTiles();
+		await delay(500);
+
+		selectedTileIds = [];
+
+		if (mistakes === 4) {
+			gameStatus = 'revealing-loss';
+
+			if (solution) {
+				const solvedGrpIds = solvedGroups.map((grp) => grp.difficulty);
+				const unsolvedGroups = solution
+          .filter((grp) => !solvedGrpIds.includes(grp.difficulty))
+          .sort((a, b) => a.difficulty - b.difficulty); 
+
+				for (const grp of unsolvedGroups) {
+					await absorbTiles(grp, grp.tiles.map((t) => t.id));
+					await delay(500);
+				}
+			}
+
+			gameStatus = 'lost';
+		}
+
+		animationPhase = null;
+	};
+
+	const evaluateResult = async (response: GuessResponse) => {
+		if (response.result === 'correct') {
+      showToast('correct');
+			await handleCorrectGuess(response.group);
+		} else if (response.result === 'incorrect') {
+      showToast('incorrect');
+			await handleIncorrectGuess(response.solution);
+		} else if (response.result === 'one-away') {
+      showToast('one-away');
+			await handleIncorrectGuess(response.solution);
+		}
+	};
+
+
+  const showToast = (result: ToastKey) => {
+    if (mistakes === 3 && (result === 'incorrect' || result === 'one-away')) {
+      toastMessage = pickMessage(toastMessages.lost);
+    } else {
+      toastMessage = pickMessage(toastMessages[result]); 
     }
   }
+
 </script>
 
 <div class="game__inner">
@@ -149,18 +198,20 @@
 	<Board
 		bind:this={board}
 		{canInteract}
+    {canSelect}
 		{selectedTileIds}
 		{tiles}
-    {solvedGroups}
+		{solvedGroups}
 		groupSize={puzzle.groupSize}
 		onReady={handleBoardReady}
 		onToggleTile={handleToggleTile}
 	/>
 	{#if boardReady}
-    <Toast message={toastMessage}/>
-    <Mistakes {mistakes}/>
+		<Toast message={toastMessage} />
+		<Mistakes {mistakes} />
 		<Controls
 			{canDeselect}
+			{canInteract}
 			{canSubmit}
 			onShuffle={handleShuffleTiles}
 			onDeselect={handleDeselectAll}
@@ -174,7 +225,7 @@
 		padding-block-start: var(--space-md);
 		display: grid;
 		gap: var(--space-s);
-    position: relative; 
+		position: relative;
 	}
 
 	.game__lede {
