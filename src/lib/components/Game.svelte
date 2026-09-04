@@ -23,6 +23,7 @@
   let solvedGroups = $state<SolvedGroup[]>([]);
   let mistakes = $state(0); 
   let toastMessage = $state<ToastMessage | null>(null);
+  let guessKeys = $state<string[]>([]); 
 
 	let board: Board;
 
@@ -63,11 +64,19 @@
 		selectedTileIds = [];
 	};
 
-  const updateToastMessage = (message: ToastMessage) => 
-    toastMessage = message; 
-
 	const handleSubmitGuess = async () => {
 		if (!canSubmit || !canInteract) return;
+
+    const guessKey = selectedTileIds.sort().join(',');
+
+    if (guessKeys.includes(guessKey)) {
+      toastMessage = { id: 'guessed', text: 'You already guessed that!' };
+      return; 
+    }
+
+    guessKeys.push(guessKey); 
+
+
 		gameStatus = 'submitting';
 
 		try {
@@ -126,7 +135,7 @@
       toastMessage = pickMessage(incorrectMessages); 
       await handleIncorrectGuess(); 
     } else if (response.result === 'one-away') {
-      toastMessage = oneAwayMessage; 
+      toastMessage = { id: 'one-away', text: 'One away!' }; 
       await handleIncorrectGuess(); 
     }
   }
