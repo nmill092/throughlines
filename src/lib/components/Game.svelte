@@ -9,19 +9,22 @@
 	import Controls from './Controls.svelte';
 	import Mistakes from './Mistakes.svelte';
 
-	import { pickMessage, toastMessages, type ToastKey, type ToastMessage } from '$lib/toast';
 	import { delay, toShuffled } from '$lib/utils/helpers';
 	import Toast from './Toast.svelte';
 	import { motion } from '$lib/motion.svelte';
 	import Modal from './Modal.svelte';
 	import { onMount } from 'svelte';
 	import { clearGame, loadGame, saveGame, type SavedGame } from '$lib/storage';
+	import { Toaster } from '$lib/toaster.svelte';
+	import type { ToastKey } from '$lib/toast';
 	
   interface Props {
 		puzzle: ClientPuzzle;
 	}
 
 	let { puzzle }: Props = $props();
+
+  const toaster = new Toaster(); 
 
 
     const SAVED_STATUS_MAP = {
@@ -65,7 +68,6 @@
 	let boardReady = $state(false);
 	let solvedGroups = $state<SolvedGroup[]>([]);
 	let mistakes = $state(0);
-	let toastMessage = $state<ToastMessage | null>(null);
   let modalDismissed = $state(false); 
   let guessHistory = $state<number[][]>([]);
   let lostSolution = $state<SolvedGroup[] | null>(null);  // to store the solution when the user loses
@@ -109,12 +111,6 @@
 
   const CONFETTI_DURATION_MS = 2000; 
   const MAX_CONFETTI_DELAY = 2000; 
-
-	$effect(() => {
-		if (!toastMessage) return;
-		const t = setTimeout(() => (toastMessage = null), 2000);
-		return () => clearTimeout(t);
-	});
 
   $effect(() => {
     if (!restored) return; 
@@ -287,14 +283,14 @@
 
 	const showToast = (result: ToastKey) => {
 		if (mistakes === 3 && (result === 'incorrect' || result === 'one-away')) {
-			toastMessage = pickMessage(toastMessages.lost);
+      toaster.show('lost'); 
 		} else {
-			toastMessage = pickMessage(toastMessages[result]);
+      toaster.show(result); 
 		}
 	};
 
   const handleResetGame = () => {
-    modalDismissed = true; 
+    modalDismissed = false; 
     gameStatus = 'playing'; 
     solvedGroups = [];
     tiles = [...puzzle.tiles].sort((a, b) => (a.position > b.position ? 1 : -1)); 
@@ -323,7 +319,7 @@
       onToggleTile={handleToggleTile}
     />
     {#if boardReady}
-      <Toast message={toastMessage} />
+      <Toast message={toaster.message} />
       <Mistakes {mistakes} />
       <Controls
         {canDeselect}
