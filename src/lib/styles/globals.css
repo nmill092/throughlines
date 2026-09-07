@@ -4,3 +4,11 @@
 @import url("./tokens.css") layer(tokens);
 @import url("./base.css") layer(base);
 @import url("./utilities.css") layer(utilities);
+
+@font-face {
+  font-family: 'Aimla';
+  src: url('/fonts/Aimla.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap; /* Helps with loading performance */
+}

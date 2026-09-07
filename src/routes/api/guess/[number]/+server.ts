@@ -1,5 +1,5 @@
 import { getPuzzleByNumber } from "$lib/server/utils";
-import { evaluateGuess } from "$lib/utils";
+import { evaluateGuess } from "$lib/utils/gameUtils";
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { error } from "@sveltejs/kit";
 import { z } from 'zod'; 

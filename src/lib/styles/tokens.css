@@ -4,14 +4,14 @@
 --color-beige: oklch(98.25% 0.01 84.57); 
 
 --color-yellow: oklch(85.61% 0.11 81.09); 
---color-red: oklch(70.42% 0.19 17.75);  
+--color-purple: oklch(80.8% 0.1 336.32);  
 --color-green: oklch(84.01% 0.1 122.35); 
 --color-blue: oklch(87.28% 0.05 258.83); 
 --color-offblack: oklch(31.32% 0 0); 
 --color-jameswhite: oklch(94.43% 0.02 114.38); 
 
 --font-public-sans: 'Public Sans Variable', system-ui, sans-serif;
---font-suez-one: 'Suez One', serif;
+--font-aimla: 'Aimla', serif;
 
 
 /** font sizes **/
@@ -44,15 +44,15 @@
 /** semantics **/ 
 --color-paper: var(--color-beige); 
 --color-body: var(--color-offblack);
---color-difficulty-1: var(--color-green);
---color-difficulty-2: var(--color-blue);
---color-difficulty-3: var(--color-yellow);
---color-difficulty-4: var(--color-red); 
+--color-difficulty-1: var(--color-yellow);
+--color-difficulty-2: var(--color-green);
+--color-difficulty-3: var(--color-blue);
+--color-difficulty-4: var(--color-purple); 
 --color-accent: var(--color-yellow);
 --color-tile: var(--color-jameswhite);
 
 --font-body: var(--font-public-sans);
---font-brand: var(--font-suez-one);
+--font-brand: var(--font-aimla);
 
 --page-gutter: var(--space-xl);
 --radius-pill: 999px; 

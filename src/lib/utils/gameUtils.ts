@@ -1,15 +1,4 @@
-import type { GuessResponse, Puzzle } from "./types/puzzle";
-
-	export function toShuffled<T>(items: T[]): T[] {
-		const copy = [...items];
-
-		for (let i = copy.length - 1; i > 0; i--) {
-			const idx = Math.floor(Math.random() * (i + 1));
-			[copy[i], copy[idx]] = [copy[idx], copy[i]];
-		}
-
-		return copy;
-	}
+import type { GuessResponse, Puzzle } from "../types/puzzle";
 
 export const evaluateGuess = (puzzle: Puzzle, tileIds: number[]): GuessResponse => {
   const guessTiles = new Set(tileIds); 

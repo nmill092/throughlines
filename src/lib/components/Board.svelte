@@ -34,6 +34,10 @@
     onToggleTile,
   }: Props = $props();
 
+  $effect(() => {
+    if(!tiles.length) onReady(); 
+  })
+
    const getTilesById = (ids: number[]) => 
     ids.map(id => tileMap.get(id))
        .filter((el): el is HTMLElement => Boolean(el)); 

@@ -2,6 +2,7 @@ export type GameStatus =
     | 'playing'
     | 'submitting'
     | 'revealing-loss'
+    | 'celebrating-win'
     | 'won'
     | 'lost';
 
