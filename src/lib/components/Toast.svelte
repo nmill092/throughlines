@@ -1,12 +1,19 @@
 <script lang="ts">
+	import { motion } from "$lib/motion.svelte";
 	import type { ToastMessage } from "$lib/toast";
-	import { fade, fly } from "svelte/transition";
+	import { fade, fly, type FadeParams, type FlyParams } from "svelte/transition";
 
   interface Props {
     message: ToastMessage | null 
   }
 
   let { message }: Props = $props(); 
+
+  let inTransition = $derived(!motion.reduced ? fly : fade); 
+  let transitionProps: FlyParams | FadeParams = $derived({
+    duration: 300, 
+    ...(!motion.reduced ? { y: 500 } : {})
+  }); 
 
 </script>
 
@@ -16,7 +23,9 @@
   aria-live="polite">
   {#if message}
     {#key message.id}
-     <p class="toast__message" in:fly|global={{ y: 500 }} out:fade|global>{ message.text }</p> 
+     <p class="toast__message" 
+     in:inTransition|global={transitionProps} 
+     out:fade|global>{ message.text }</p> 
     {/key}
   {/if}
 </div>

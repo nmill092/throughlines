@@ -1,17 +1,17 @@
 import { prefersReducedMotion } from 'svelte/motion';
+import { loadMotionPref, saveMotionPref } from './storage';
 
-let userReducedMotion = $state(false);
+let override = $state<boolean | null>(null);
 
 export const motion = {
-	get userReduced() {
-		return userReducedMotion;
-	},
-
+  init () {
+    override = loadMotionPref(); 
+  },
 	get reduced() {
-		return prefersReducedMotion.current || userReducedMotion;
+		return override ?? prefersReducedMotion.current;
 	},
-
 	toggle() {
-		userReducedMotion = !userReducedMotion;
+    override = !(override ?? prefersReducedMotion.current); 
+    saveMotionPref(override);
 	}
 };

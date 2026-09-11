@@ -1,9 +1,21 @@
 import z from "zod";
 import type { Puzzle, SolvedGroup, Tile } from "./types/puzzle";
+import type { GameStatus } from "./types/game";
 
 const VERSION = 'v1'; 
 const getStorageKey = (puzzleNumber: number) => 
     `throughlines:${VERSION}:puzzle:${puzzleNumber}`;
+
+const motionKey = `throughlines:${VERSION}:motion`; 
+
+const SAVED_STATUS_MAP = {
+      'won': 'won',
+      'celebrating-win': 'won',
+      'lost': 'lost',
+      'revealing-loss': 'lost',
+      'playing': 'playing',
+      'submitting': 'playing'
+  } satisfies Record<GameStatus, 'won' | 'lost' | 'playing'>; 
 
 const tileSchema = z.object({ 
   id: z.number().int().nonnegative(), 
@@ -72,4 +84,41 @@ export const clearGame = (puzzleNumber: Puzzle['number']) => {
   } catch (err) {
     console.error('Failed to clear game state.', { err })
   }
+}
+
+export const getMappedSaveStatus = (status: GameStatus) => 
+  SAVED_STATUS_MAP[status]; 
+
+
+const motionSchema = z.object({ 
+  reduced: z.boolean()
+}); 
+
+export const saveMotionPref = (reduced: boolean) => {
+  if (typeof localStorage === 'undefined') return;
+  try {
+    localStorage.setItem(motionKey, JSON.stringify({ reduced })); 
+  } catch (err) {
+    console.error('Failed to update motion preference.', { err }); 
+  }
+}
+
+export const loadMotionPref = (): boolean | null => {
+  if (typeof localStorage === 'undefined') return null; 
+  try {
+    const reduced = localStorage.getItem(motionKey); 
+    if (reduced) {
+      const reducedJson = JSON.parse(reduced); 
+      const parsed = motionSchema.safeParse(reducedJson); 
+      if (parsed.success) {
+        return parsed.data.reduced; 
+      } else {
+        return null; 
+      }
+    }
+  } catch (err) {
+    console.error('Failed to get motion preference.', { err }); 
+  }
+
+  return null; 
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade, fly } from 'svelte/transition';
+	import { fade } from 'svelte/transition';
 
 	interface Props {
 		modalOpen: boolean;
@@ -35,8 +35,8 @@
  {#key modalOpen}
 
 <dialog
-in:fly={{ y: 500 }}
-out:fade={{ duration: 500 }}
+in:fade={{ duration: 300 }}
+out:fade={{ duration: 300 }}
 	aria-labelledby="game-result"
 	class="modal"
 	bind:this={dialog}

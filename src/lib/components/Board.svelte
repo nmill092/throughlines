@@ -7,6 +7,8 @@
 	import { tick } from "svelte";
 	import type { SolvedGroup } from "$lib/types/puzzle";
 	import SolvedGroupCard from "./SolvedGroupCard.svelte";
+	import { motion } from "$lib/motion.svelte";
+	import { delay } from "$lib/utils/helpers";
 
   gsap.registerPlugin(Flip);
 
@@ -84,12 +86,17 @@
   }
 
   export const gatherTiles = async (flipAction: () => void) => {
+    if (motion.reduced) {
+      flipAction(); 
+      await delay(400);
+      return; 
+    }
     const state = getTileState(); 
     flipAction(); 
     await tick(); 
     return new Promise<void>(res => {
       Flip.from(state, {
-        duration: 0.5, 
+        duration: .5,
         ease: 'back.out',
         onComplete: res 
       })
@@ -98,7 +105,18 @@
 
   export const celebrateTiles = async (ids: number[], difficulty: number) => {
     const tiles = getTilesById(ids); 
-    return new Promise((res) => {
+    return new Promise<void>((res) => {
+
+      if (motion.reduced) {
+        gsap.to(tiles, { 
+          backgroundColor: `var(--color-difficulty-${difficulty})`,
+          color: 'var(--color-body)',
+          duration: .2
+        });
+        setTimeout(res, 400)
+        return; 
+      }
+
 			gsap.killTweensOf(tiles);
 			const tl = gsap.timeline({ 
         defaults: {
@@ -132,14 +150,18 @@
 
 
   export const shakeTiles = async() => {
+    return new Promise<void>(res => {
+
+    if (motion.reduced) {
+      res(); 
+      return; 
+    }
+
     const tiles = getTilesById(selectedTileIds); 
     gsap.killTweensOf(tiles); 
-
-    return new Promise(res => {
       const tl = gsap.timeline({ defaults: {
         duration: 0.1,
-        stagger: .015, 
-       
+        stagger: .015,
         ease: 'elasticOut'
       }, onComplete: res }); 
 

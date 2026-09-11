@@ -1,14 +1,12 @@
 <script lang="ts">
   import { motion } from "$lib/motion.svelte";
+	import Switch from "./Switch.svelte";
 </script>
 
 <footer class="footer">
   <div class="container">
     <div class="footer__inner">
-      <div class="motion">
-        Disable Animations? { motion.reduced ? 'Disable' : 'Enable' }
-        <button onclick={() => motion.toggle()}>Toggle</button>
-      </div>
+    <Switch/>
     </div>
   </div>
 </footer>

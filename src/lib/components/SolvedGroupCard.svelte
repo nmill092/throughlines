@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { motion } from '$lib/motion.svelte';
 	import type { SolvedGroup } from '$lib/types/puzzle';
 	import { elasticOut } from 'svelte/easing';
 	import { scale } from 'svelte/transition';
@@ -13,7 +14,9 @@
 <div
 	class="group"
 	style:background-color={`var(--color-difficulty-${group.difficulty})`}
-	in:scale={{ start: 0.7, duration: 800, easing: elasticOut }}
+	in:scale={{ 
+    start: 0.7, 
+    duration: motion.reduced ? 0 : 800, easing: elasticOut }}
 >
 <div class="group__text">
   <div class="group__title">

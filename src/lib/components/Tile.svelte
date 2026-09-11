@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { motion } from "$lib/motion.svelte";
 	import { scale } from "svelte/transition";
 
   interface Props { 
@@ -37,7 +38,9 @@
 
 {#if mounted}
   <button
-      in:scale={{ delay: position * 20 }}
+      in:scale={{ 
+        delay: motion.reduced ? 0 : position * 20, 
+        duration: motion.reduced ? 0 : 300 }}
       class="tile" 
       disabled={disabled}
       class:selected={selected} 

@@ -14,7 +14,7 @@
 	import { motion } from '$lib/motion.svelte';
 	import Modal from './Modal.svelte';
 	import { onMount } from 'svelte';
-	import { clearGame, loadGame, saveGame, type SavedGame } from '$lib/storage';
+	import { clearGame, getMappedSaveStatus, loadGame, saveGame, type SavedGame } from '$lib/storage';
 	import { Toaster } from '$lib/toaster.svelte';
 	import type { ToastKey } from '$lib/toast';
 	
@@ -25,16 +25,6 @@
 	let { puzzle }: Props = $props();
 
   const toaster = new Toaster(); 
-
-
-    const SAVED_STATUS_MAP = {
-      'won': 'won',
-      'celebrating-win': 'won',
-      'lost': 'lost',
-      'revealing-loss': 'lost',
-      'playing': 'playing',
-      'submitting': 'playing'
-    } satisfies Record<GameStatus, 'won' | 'lost' | 'playing'>; 
 
   onMount(() => {
     const saved = loadGame(puzzle.number);
@@ -116,7 +106,7 @@
     if (!restored) return; 
 
     const savedState: SavedGame = {
-      status: SAVED_STATUS_MAP[gameStatus],
+      status: getMappedSaveStatus(gameStatus),
       solvedGroups: $state.snapshot(solvedGroups), 
       mistakes, 
       guessHistory: $state.snapshot(guessHistory),
@@ -237,8 +227,11 @@
     if (!board) return; 
 		mistakes++;
     animationPhase = 'shaking';
+ 
+    // if (!motion.reduced) {
+		  await board.shakeTiles();
+    // }
 
-		await board.shakeTiles();
 		await delay(500);
 
 		selectedTileIds = [];
