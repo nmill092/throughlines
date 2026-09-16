@@ -23,5 +23,8 @@
 <Footer/>
 
 <style>
-	
+  main {
+    display: grid;
+    align-items: center;
+  }
 </style>
