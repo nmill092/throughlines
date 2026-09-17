@@ -56,7 +56,7 @@ out:fade={{ duration: 300 }}
 				{#if outcome === 'lost'}
 					You got {correctGuesses} out of 4 throughlines!
 				{:else if outcome === 'won'}
-					You solved the puzzle with {mistakes} {mistakes > 1 ? 'mistakes' : 'mistake'}!
+					You solved the puzzle with {mistakes} {mistakes === 1 ? 'mistake' : 'mistakes'}!
 				{/if}
 
         Here are your results: 
