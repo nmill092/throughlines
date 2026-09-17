@@ -73,6 +73,11 @@
   const tileHeight = 120;
 
   export const shuffleTiles = async (flipAction: () => void) => {
+     if (motion.reduced) {
+      flipAction(); 
+      return; 
+    }
+
     const state = getTileState(); 
     flipAction(); 
     await tick(); 
