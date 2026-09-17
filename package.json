@@ -13,7 +13,8 @@
     "lint": "prettier --check . && eslint .",
     "format": "prettier --write .",
     "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types ./src/worker-configuration.d.ts",
+    "cf-typegen": "wrangler types ./src/worker-configuratioan.d.ts",
+    "seed": "npx tsx ./src/lib/scripts/generate-seed.ts && npm run db:seed:local",
     "db:seed:local": "npx wrangler d1 execute DB --local --file=src/lib/server/db/seed.sql"
   },
   "devDependencies": {
