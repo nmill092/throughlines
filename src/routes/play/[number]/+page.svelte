@@ -4,9 +4,7 @@
 </script>
 
 <section class="game">
-	<div class="container">
-		<Game puzzle={data.puzzle} />
-	</div>
+		<Game puzzle={data.puzzle} />	
 </section>
 
 <style>

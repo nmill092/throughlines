@@ -1,4 +1,4 @@
-import {type CategoryRaw, type TileRaw, type PuzzleRaw } from "$lib/types/db";
+import { type CategoryRaw, type PuzzleRaw, type TileRaw } from "$lib/types/db";
 import type { Category, Puzzle } from "$lib/types/puzzle";
 
 export const getPuzzleByNumber = async (number: number, db: D1Database): Promise<Puzzle | null>  => {
@@ -52,4 +52,14 @@ export const getPuzzleByNumber = async (number: number, db: D1Database): Promise
       groupSize: puzzleRow.group_size, 
       categories: categoriesWithTiles
     }
+}
+
+export const getAllPublishedPuzzles = async (db: D1Database): Promise<number[]> => {
+  const publishedPuzzles = await db.prepare(`
+      SELECT number
+      FROM puzzles
+      WHERE is_published = 1
+    `).all<{number: number}>();
+
+  return publishedPuzzles.results.map(num => num.number); 
 }

@@ -81,5 +81,59 @@ export const seeds: AuthoredPuzzle[] = [
             tiles: ['facebook', 'mouthpiece', 'footnote', 'handout']
         }
     ]
+  },
+  { 
+    number: 5, 
+    groupSize: 4, 
+    isPublished: true, 
+    categories: [
+        {
+            title: 'Golden _____',
+            difficulty: 2, 
+            tiles: ['ticket', 'hour', 'parachute', 'retriever']
+        },
+        {
+            title: 'Hot _____',
+            difficulty: 3, 
+            tiles: ['minute', 'mess', 'plate', 'yoga']
+        },
+        {
+            title: 'Music theory words',
+            difficulty: 1, 
+            tiles: ['sharp', 'minor', 'staff', 'flat']
+        },
+         {
+            title: '_____ general',
+            difficulty: 4, 
+            tiles: ['major', 'surgeon', 'dollar', 'attorney']
+        }
+    ]
+  },
+  { 
+    number: 6, 
+    groupSize: 4, 
+    isPublished: true, 
+    categories: [
+        {
+            title: 'Words for overly sentimental, without -y',
+            difficulty: 4, 
+            tiles: ['hoke', 'corn', 'chees', 'schmaltz']
+        },
+        {
+            title: 'Slang terms for prison',
+            difficulty: 2, 
+            tiles: ['pokey', 'joint', 'pen', 'lockup']
+        },
+        {
+            title: '_____down',
+            difficulty: 3, 
+            tiles: ['lock', 'shut', 'low', 'run']
+        },
+         {
+            title: '_____ season',
+            difficulty: 1, 
+            tiles: ['open', 'cuffing', 'shoulder', 'flu']
+        }
+    ]
   }
 ]

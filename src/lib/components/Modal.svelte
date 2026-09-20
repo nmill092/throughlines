@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fade } from 'svelte/transition';
+	import { motion } from '$lib/motion.svelte';
 
 	interface Props {
 		modalOpen: boolean;
@@ -32,13 +32,10 @@
 	});
 </script>
 
- {#key modalOpen}
-
 <dialog
-in:fade={{ duration: 300 }}
-out:fade={{ duration: 300 }}
 	aria-labelledby="game-result"
 	class="modal"
+	class:modal--no-motion={motion.reduced}
 	bind:this={dialog}
 	closedby="any"
 	onclose={onClose}
@@ -81,7 +78,6 @@ out:fade={{ duration: 300 }}
 		</div>
 	</div>
 </dialog>
-  {/key}
 
 <style>
 
@@ -94,10 +90,46 @@ out:fade={{ duration: 300 }}
 		background-color: var(--color-paper);
 		border-radius: 0.4rem;
 		box-shadow: 1px 1px 10px oklch(from var(--color-body) l c h / 0.4);
+		opacity: 0;
+		translate: 0 1rem;
+		transition:
+			opacity 300ms ease,
+			translate 300ms ease,
+			display 300ms allow-discrete,
+			overlay 300ms allow-discrete;
+
+		&[open] {
+			opacity: 1;
+			translate: 0 0;
+		}
 
 		&::backdrop {
+			background-color: oklch(from var(--color-body) l c h / 0);
+			transition:
+				background-color 300ms ease,
+				display 300ms allow-discrete,
+				overlay 300ms allow-discrete;
+		}
+
+		&[open]::backdrop {
 			background-color: oklch(from var(--color-body) l c h / 0.4);
 		}
+	}
+
+	@starting-style {
+		.modal[open] {
+			opacity: 0;
+			translate: 0 1rem;
+		}
+
+		.modal[open]::backdrop {
+			background-color: oklch(from var(--color-body) l c h / 0);
+		}
+	}
+
+	.modal--no-motion,
+	.modal--no-motion::backdrop {
+		transition-duration: 0s;
 	}
 
 	.modal__inner {
