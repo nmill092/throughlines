@@ -3,8 +3,8 @@ import type { Puzzle, SolvedGroup, Tile } from "./types/puzzle";
 import type { GameStatus } from "./types/game";
 
 const VERSION = 'v1'; 
-const getStorageKey = (puzzleNumber: number) => 
-    `throughlines:${VERSION}:puzzle:${puzzleNumber}`;
+
+const storeKey = `throughlines:${VERSION}:games`; 
 
 const motionKey = `throughlines:${VERSION}:motion`; 
 
@@ -32,59 +32,81 @@ const groupSchema = z.object({
 const saveSchema = z.object({
   status: z.enum(['playing', 'won', 'lost']),
   mistakes: z.number().int().nonnegative(), 
+  correctGuesses: z.number().int().nonnegative(),
   solvedGroups: z.array(groupSchema), 
   lostSolution: z.array(groupSchema).nullable(),
   guessHistory: z.array(z.array(z.number().int().nonnegative())), 
   tileOrder: z.array(z.number().int())
  });
 
+ const entrySchema = saveSchema.extend({
+  updatedAt: z.number().int().nonnegative()
+ })
+
+ const storeSchema = z.object({ 
+  games: z.record(z.string(), z.unknown())
+ }); 
+
 export type SavedGame = z.infer<typeof saveSchema>;
 
-export const loadGame = (puzzleNumber: Puzzle['number']) => {
-  if (typeof localStorage === 'undefined') return null; 
+type Store = { 
+  games: Record<string, z.infer<typeof entrySchema>>
+}; 
 
-  try {
-    const savedRaw = localStorage.getItem(getStorageKey(puzzleNumber)); 
+const readStore = (): Store => {
+  if (typeof localStorage === 'undefined') return { games: {} }; 
 
-    if(savedRaw) {
-      const savedJson = JSON.parse(savedRaw); 
-      if (savedJson) {
-        const savedGame = saveSchema.safeParse(savedJson);
-        if (savedGame.success) {
-           return savedGame.data; 
-        } else {
-          clearGame(puzzleNumber);
-        }
+  try { 
+    const raw = localStorage.getItem(storeKey); 
+    if (!raw) return { games: {} }; 
+    const outer = storeSchema.safeParse(JSON.parse(raw)); 
+    if (!outer.success) { 
+      localStorage.removeItem(storeKey);
+      return { games: {} }; 
+    }
+
+    const games: Store['games'] = {}; 
+    for (const [number, value] of Object.entries(outer.data.games)) {
+      const gameData = entrySchema.safeParse(value);
+      if (gameData.success) {
+        games[number] = gameData.data; 
       }
     }
+    return { games }; 
   } catch (err) {
-    console.error("Failed to retrieve saved game.", { err });
-    clearGame(puzzleNumber);
+    console.error('Failed to read game store', { err }); 
+    localStorage.removeItem(storeKey);
+    return { games: {} }; 
   }
-
-  return null; 
 }
+
+const writeStore = (store: Store) => {
+  if (typeof localStorage === 'undefined') return; 
+  try {
+    localStorage.setItem(storeKey, JSON.stringify(store)); 
+  } catch (err) {
+    console.error('Failed to save game state.', { err }); 
+  }
+}
+
+export const loadAllGames = () => 
+  readStore().games ?? null; 
+
+export const loadGame = (puzzleNumber: Puzzle['number']) => {
+  return readStore().games[String(puzzleNumber)] ?? null; 
+}
+
 export const saveGame = (puzzleNumber: Puzzle['number'], state: SavedGame) => {
-  if (typeof localStorage === 'undefined') return; 
+  const store = readStore(); 
+  store.games[String(puzzleNumber)] = { ...state, updatedAt: Date.now() }
+  writeStore(store); 
+} 
 
-  try {
-    const storageKey = getStorageKey(puzzleNumber);
-    localStorage.setItem(storageKey, JSON.stringify(state)); 
-  } catch (err) {
-    console.error('Failed to save game state.', { err })
-  }
-}
-
-export const clearGame = (puzzleNumber: Puzzle['number']) => {
-  if (typeof localStorage === 'undefined') return; 
-
-  try {
-    const storageKey = getStorageKey(puzzleNumber); 
-    localStorage.removeItem(storageKey); 
-  } catch (err) {
-    console.error('Failed to clear game state.', { err })
-  }
-}
+ export const clearGame = (puzzleNumber: Puzzle['number']) => {
+    const store = readStore();
+    delete store.games[String(puzzleNumber)];
+    writeStore(store);
+  };
 
 export const getMappedSaveStatus = (status: GameStatus) => 
   SAVED_STATUS_MAP[status]; 
@@ -122,3 +144,4 @@ export const loadMotionPref = (): boolean | null => {
 
   return null; 
 }
+
